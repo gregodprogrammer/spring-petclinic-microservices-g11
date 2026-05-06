@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-petclinic-genai-service
+  namespace: petclinic-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: genai-service
+  template:
+    metadata:
+      labels:
+        app: genai-service
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+      initContainers:
+        - name: wait-for-discovery
+          image: busybox
+          command: ['sh', '-c', 'until wget -q http://spring-petclinic-discovery-server:8761/actuator/health; do echo waiting; sleep 5; done']
+      containers:
+        - name: genai-service
+          image: 118821711881.dkr.ecr.af-south-1.amazonaws.com/spring-petclinic-g11-genai-service:latest
+          ports:
+            - containerPort: 8084
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: genai-secret
+                  key: OPENAI_API_KEY
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-petclinic-genai-service
+  namespace: petclinic-staging
+spec:
+  selector:
+    app: genai-service
+  ports:
+    - port: 8084
+      targetPort: 8084

@@ -1,0 +1,34 @@
+registry: 118821711881.dkr.ecr.af-south-1.amazonaws.com
+imageTag: latest
+imagePullSecret: ecr-secret
+namespace: petclinic-staging
+
+services:
+  configServer:
+    name: spring-petclinic-g11-config-server
+    port: 8888
+    replicas: 1
+  discoveryServer:
+    name: spring-petclinic-g11-discovery-server
+    port: 8761
+    replicas: 1
+  apiGateway:
+    name: spring-petclinic-g11-api-gateway
+    port: 8080
+    replicas: 1
+  customersService:
+    name: spring-petclinic-g11-customers-service
+    port: 8081
+    replicas: 1
+  vetsService:
+    name: spring-petclinic-g11-vets-service
+    port: 8083
+    replicas: 1
+  visitsService:
+    name: spring-petclinic-g11-visits-service
+    port: 8082
+    replicas: 1
+  genaiService:
+    name: spring-petclinic-g11-genai-service
+    port: 8084
+    replicas: 1
